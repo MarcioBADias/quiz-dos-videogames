@@ -1,8 +1,17 @@
-# React + Vite
+# Bateria de Desafios 12
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Uma coisa que eu nunca disse:
 
-Currently, two official plugins are available:
+Se não foi especificado "como" fazer, descobrir é parte do desafio.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+
+Em até 48h úteis após ver a Aula 28, entregue o 20% que resolve o problema mais latente que a aplicação Quiz dos Videogames se propõe a resolver.
+
+Funcionalidades secundárias podem ser entregues depois.
+
+Faça deploy da sua primeira release em qualquer serviço de hospedagem gratuito, que te dê uma URL pública.
+
+A pasta src contém recursos relevantes para o projeto.
+
+Priorize apenas o que deve ser priorizado, pra que você consiga entregar dentro do prazo.
