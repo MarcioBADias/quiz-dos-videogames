@@ -9,12 +9,12 @@ const App = () => {
           </div>
           <div>
             <h4>Qual foi o videogame?</h4>
-            <div className="options">
-              <button className="btn btn-option">Opcao 1</button>
-              <button className="btn btn-option">Opcao 2</button>
-              <button className="btn btn-option">Opcao 3</button>
-              <button className="btn btn-option">Opcao 4</button>
-            </div>
+            <ul className="options">
+              <li className="btn btn-option">Opcao 1</li>
+              <li className="btn btn-option">Opcao 2</li>
+              <li className="btn btn-option">Opcao 3</li>
+              <li className="btn btn-option">Opcao 4</li>
+            </ul>
           </div>
           <div>
             <button className="btn btn-ui">Proxima</button>
