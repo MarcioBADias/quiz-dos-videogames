@@ -26,6 +26,10 @@ const reduce = (state, action) => {
     }
   }
 
+  if (action.type === 'clicked_restart') {
+    return { ...state, userScore: 0, shouldShowResult: false }
+  }
+
   return state
 }
 
@@ -54,6 +58,9 @@ const App = () => {
 
   const handleClickNextQustion = () =>
     dispatch({ type: 'clicked_next_question' })
+
+  const handleClickRestart = () => dispatch({ type: 'clicked_restart' })
+
   const userHasAnwered = state.clickedOption !== null
   const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
   const percentage = (state.userScore / maxScore) * 100
@@ -67,12 +74,17 @@ const App = () => {
             <h1>Quiz dos Videogames</h1>
           </div>
           {state.shouldShowResult && (
-            <div className="result">
-              <span>
-                Voce fez <b>{state.userScore}</b> pontos de {maxScore} (
-                {percentage}%)
-              </span>
-            </div>
+            <>
+              <div className="result">
+                <span>
+                  Voce fez <b>{state.userScore}</b> pontos de {maxScore} (
+                  {percentage}%)
+                </span>
+              </div>
+              <button onClick={handleClickRestart} className="btn btn-ui">
+                Reiniciar o Quiz
+              </button>
+            </>
           )}
           {state.apiData.length > 0 && !state.shouldShowResult && (
             <>
