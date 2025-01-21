@@ -5,6 +5,10 @@ const reduce = (state, action) => {
     return { ...state, apiData: action.apiData }
   }
 
+  if (action.type === 'clicked_option') {
+    return { ...state, clickedOption: action.index }
+  }
+
   return state
 }
 
@@ -12,6 +16,7 @@ const App = () => {
   const [state, dispatch] = useReducer(reduce, {
     currentQuestion: 0,
     apiData: [],
+    clickedOption: null,
   })
 
   useEffect(() => {
@@ -22,6 +27,9 @@ const App = () => {
       .then((apiData) => dispatch({ type: 'set_api_data', apiData }))
       .catch((error) => alert(error.message))
   }, [])
+
+  const handleClickOption = (index) =>
+    dispatch({ type: 'clicked_option', index })
 
   return (
     <>
@@ -37,9 +45,14 @@ const App = () => {
                 <h4>{state.apiData[state.currentQuestion].question}</h4>
                 <ul className="options">
                   {state.apiData[state.currentQuestion].options.map(
-                    (option) => (
-                      <li key={option} className="btn btn-option">
-                        {option}
+                    (option, index) => (
+                      <li key={option}>
+                        <button
+                          onClick={() => handleClickOption(index)}
+                          className="btn btn-option"
+                        >
+                          {option}
+                        </button>
                       </li>
                     ),
                   )}
