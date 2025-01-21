@@ -6,18 +6,36 @@ const reduce = (state, action) => {
   }
 
   if (action.type === 'clicked_option') {
-    return { ...state, clickedOption: action.index }
+    return {
+      ...state,
+      clickedOption: action.index,
+      userScore:
+        action.index === state.apiData[state.currentQuestion]?.correctOption
+          ? state.userScore + 10
+          : state.userScore,
+    }
+  }
+
+  if (action.type === 'clicked_next_question') {
+    return {
+      ...state,
+      currentQuestion: state.currentQuestion + 1,
+      clickedOption: null,
+    }
   }
 
   return state
 }
 
+const initialState = {
+  currentQuestion: 0,
+  apiData: [],
+  clickedOption: null,
+  userScore: 0,
+}
+
 const App = () => {
-  const [state, dispatch] = useReducer(reduce, {
-    currentQuestion: 0,
-    apiData: [],
-    clickedOption: null,
-  })
+  const [state, dispatch] = useReducer(reduce, initialState)
 
   useEffect(() => {
     fetch(
@@ -30,6 +48,10 @@ const App = () => {
 
   const handleClickOption = (index) =>
     dispatch({ type: 'clicked_option', index })
+
+  const handleClickNextQustion = () =>
+    dispatch({ type: 'clicked_next_question' })
+  const userHasAnwered = state.clickedOption !== null
 
   return (
     <>
@@ -54,7 +76,7 @@ const App = () => {
                             btn-option 
                             ${state.clickedOption === index ? 'answer' : ''}
                             ${
-                              state.clickedOption !== null
+                              userHasAnwered
                                 ? state.apiData[state.currentQuestion]
                                     ?.correctOption === index
                                   ? 'correct'
@@ -63,7 +85,7 @@ const App = () => {
                             }
                             
                           `}
-                          disabled={state.clickedOption !== null}
+                          disabled={userHasAnwered}
                         >
                           {option}
                         </button>
@@ -72,9 +94,16 @@ const App = () => {
                   )}
                 </ul>
               </div>
-              <div>
-                <button className="btn btn-ui">Proxima</button>
-              </div>
+              {userHasAnwered && (
+                <div>
+                  <button
+                    onClick={handleClickNextQustion}
+                    className="btn btn-ui"
+                  >
+                    Proxima
+                  </button>
+                </div>
+              )}
             </>
           )}
         </main>
