@@ -67,9 +67,12 @@ const App = () => {
             <h1>Quiz dos Videogames</h1>
           </div>
           {state.shouldShowResult && (
-            <p>
-              Voce fez {state.userScore} pontos de {maxScore} ({percentage}%)
-            </p>
+            <div className="result">
+              <span>
+                Voce fez <b>{state.userScore}</b> pontos de {maxScore} (
+                {percentage}%)
+              </span>
+            </div>
           )}
           {state.apiData.length > 0 && !state.shouldShowResult && (
             <>
