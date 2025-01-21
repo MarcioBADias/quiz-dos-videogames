@@ -49,7 +49,20 @@ const App = () => {
                       <li key={option}>
                         <button
                           onClick={() => handleClickOption(index)}
-                          className={`btn btn-option ${state.clickedOption === index ? 'answer' : ''}`}
+                          className={`
+                            btn 
+                            btn-option 
+                            ${state.clickedOption === index ? 'answer' : ''}
+                            ${
+                              state.clickedOption !== null
+                                ? state.apiData[state.currentQuestion]
+                                    ?.correctOption === index
+                                  ? 'correct'
+                                  : 'wrong'
+                                : ''
+                            }
+                            
+                          `}
                           disabled={state.clickedOption !== null}
                         >
                           {option}
