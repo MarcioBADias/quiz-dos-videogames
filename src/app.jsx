@@ -10,8 +10,8 @@ const reduce = (state, action) => {
       ...state,
       clickedOption: action.index,
       userScore:
-        action.index === state.apiData[state.currentQuestion]?.correctOption
-          ? state.userScore + 10
+        action.index === state.apiData[state.currentQuestion].correctOption
+          ? state.userScore + state.apiData[state.currentQuestion].points
           : state.userScore,
     }
   }
@@ -22,6 +22,7 @@ const reduce = (state, action) => {
       ...state,
       currentQuestion: lastQuestion ? 0 : state.currentQuestion + 1,
       clickedOption: null,
+      shouldShowResult: lastQuestion,
     }
   }
 
@@ -33,6 +34,7 @@ const initialState = {
   apiData: [],
   clickedOption: null,
   userScore: 0,
+  shouldShowResult: false,
 }
 
 const App = () => {
@@ -53,6 +55,8 @@ const App = () => {
   const handleClickNextQustion = () =>
     dispatch({ type: 'clicked_next_question' })
   const userHasAnwered = state.clickedOption !== null
+  const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
+  const percentage = (state.userScore / maxScore) * 100
 
   return (
     <>
@@ -62,7 +66,12 @@ const App = () => {
             <img src="./img/logo-quiz-videogames.png" alt="Logo" />
             <h1>Quiz dos Videogames</h1>
           </div>
-          {state.apiData.length > 0 && (
+          {state.shouldShowResult && (
+            <p>
+              Voce fez {state.userScore} pontos de {maxScore} ({percentage}%)
+            </p>
+          )}
+          {state.apiData.length > 0 && !state.shouldShowResult && (
             <>
               <div>
                 <h4>{state.apiData[state.currentQuestion].question}</h4>
