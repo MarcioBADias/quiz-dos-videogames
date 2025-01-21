@@ -17,9 +17,10 @@ const reduce = (state, action) => {
   }
 
   if (action.type === 'clicked_next_question') {
+    const lastQuestion = state.currentQuestion + 1 === state.apiData.length
     return {
       ...state,
-      currentQuestion: state.currentQuestion + 1,
+      currentQuestion: lastQuestion ? 0 : state.currentQuestion + 1,
       clickedOption: null,
     }
   }
@@ -100,7 +101,9 @@ const App = () => {
                     onClick={handleClickNextQustion}
                     className="btn btn-ui"
                   >
-                    Proxima
+                    {state.currentQuestion === state.apiData.length - 1
+                      ? 'Finalizar'
+                      : 'Proxima'}
                   </button>
                 </div>
               )}
