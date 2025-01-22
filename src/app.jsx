@@ -92,30 +92,27 @@ const App = () => {
                 <h4>{state.apiData[state.currentQuestion].question}</h4>
                 <ul className="options">
                   {state.apiData[state.currentQuestion].options.map(
-                    (option, index) => (
-                      <li key={option}>
-                        <button
-                          onClick={() => handleClickOption(index)}
-                          className={`
-                            btn 
-                            btn-option 
-                            ${state.clickedOption === index ? 'answer' : ''}
-                            ${
-                              userHasAnwered
-                                ? state.apiData[state.currentQuestion]
-                                    ?.correctOption === index
-                                  ? 'correct'
-                                  : 'wrong'
-                                : ''
-                            }
-                            
-                          `}
-                          disabled={userHasAnwered}
-                        >
-                          {option}
-                        </button>
-                      </li>
-                    ),
+                    (option, index) => {
+                      const answersClass =
+                        state.clickedOption === index ? 'answer' : ''
+                      const correctOrWrongClass = userHasAnwered
+                        ? state.apiData[state.currentQuestion]
+                            ?.correctOption === index
+                          ? 'correct'
+                          : 'wrong'
+                        : ''
+                      return (
+                        <li key={option}>
+                          <button
+                            onClick={() => handleClickOption(index)}
+                            className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                            disabled={userHasAnwered}
+                          >
+                            {option}
+                          </button>
+                        </li>
+                      )
+                    },
                   )}
                 </ul>
               </div>
