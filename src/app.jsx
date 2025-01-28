@@ -39,6 +39,7 @@ const initialState = {
   clickedOption: null,
   userScore: 0,
   shouldShowResult: false,
+  shouldShowStart: true,
 }
 
 const App = () => {
@@ -68,12 +69,13 @@ const App = () => {
   return (
     <>
       <div className="app">
+        <header className="app-header">
+          <img src="./img/logo-quiz-videogames.png" alt="Logo" />
+          <h1>Quiz dos Videogames</h1>
+        </header>
         <main className="main">
-          <div className="app-header">
-            <img src="./img/logo-quiz-videogames.png" alt="Logo" />
-            <h1>Quiz dos Videogames</h1>
-          </div>
-          {state.shouldShowResult && (
+          {state.shouldShowStart && <h2> Tela Inicial</h2>}
+          {state.shouldShowResult && !state.shouldShowStart && (
             <>
               <div className="result">
                 <span>
@@ -86,50 +88,52 @@ const App = () => {
               </button>
             </>
           )}
-          {state.apiData.length > 0 && !state.shouldShowResult && (
-            <>
-              <div>
-                <h4>{state.apiData[state.currentQuestion].question}</h4>
-                <ul className="options">
-                  {state.apiData[state.currentQuestion].options.map(
-                    (option, index) => {
-                      const answersClass =
-                        state.clickedOption === index ? 'answer' : ''
-                      const correctOrWrongClass = userHasAnwered
-                        ? state.apiData[state.currentQuestion]
-                            ?.correctOption === index
-                          ? 'correct'
-                          : 'wrong'
-                        : ''
-                      return (
-                        <li key={option}>
-                          <button
-                            onClick={() => handleClickOption(index)}
-                            className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
-                            disabled={userHasAnwered}
-                          >
-                            {option}
-                          </button>
-                        </li>
-                      )
-                    },
-                  )}
-                </ul>
-              </div>
-              {userHasAnwered && (
+          {state.apiData.length > 0 &&
+            !state.shouldShowResult &&
+            !state.shouldShowStart && (
+              <>
                 <div>
-                  <button
-                    onClick={handleClickNextQustion}
-                    className="btn btn-ui"
-                  >
-                    {state.currentQuestion === state.apiData.length - 1
-                      ? 'Finalizar'
-                      : 'Proxima'}
-                  </button>
+                  <h4>{state.apiData[state.currentQuestion].question}</h4>
+                  <ul className="options">
+                    {state.apiData[state.currentQuestion].options.map(
+                      (option, index) => {
+                        const answersClass =
+                          state.clickedOption === index ? 'answer' : ''
+                        const correctOrWrongClass = userHasAnwered
+                          ? state.apiData[state.currentQuestion]
+                              ?.correctOption === index
+                            ? 'correct'
+                            : 'wrong'
+                          : ''
+                        return (
+                          <li key={option}>
+                            <button
+                              onClick={() => handleClickOption(index)}
+                              className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                              disabled={userHasAnwered}
+                            >
+                              {option}
+                            </button>
+                          </li>
+                        )
+                      },
+                    )}
+                  </ul>
                 </div>
-              )}
-            </>
-          )}
+                {userHasAnwered && (
+                  <div>
+                    <button
+                      onClick={handleClickNextQustion}
+                      className="btn btn-ui"
+                    >
+                      {state.currentQuestion === state.apiData.length - 1
+                        ? 'Finalizar'
+                        : 'Proxima'}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
         </main>
       </div>
     </>
