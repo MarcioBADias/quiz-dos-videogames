@@ -17,17 +17,21 @@ const reduce = (state, action) => {
   }
 
   if (action.type === 'clicked_next_question') {
-    const lastQuestion = state.currentQuestion + 1 === state.apiData.length
+    const wasLastQuestion = state.currentQuestion + 1 === state.apiData.length
     return {
       ...state,
-      currentQuestion: lastQuestion ? 0 : state.currentQuestion + 1,
+      currentQuestion: wasLastQuestion ? 0 : state.currentQuestion + 1,
       clickedOption: null,
-      shouldShowResult: lastQuestion,
+      appStatus: wasLastQuestion ? 'finished' : state.appStatus,
     }
   }
 
   if (action.type === 'clicked_restart') {
-    return { ...state, userScore: 0, shouldShowResult: false }
+    return { ...state, userScore: 0, appStatus: 'ready' }
+  }
+
+  if (action.type === 'clicked_start') {
+    return { ...state, appStatus: 'active' }
   }
 
   return state
@@ -38,8 +42,7 @@ const initialState = {
   apiData: [],
   clickedOption: null,
   userScore: 0,
-  shouldShowResult: false,
-  shouldShowStart: true,
+  appStatus: 'ready',
 }
 
 const App = () => {
@@ -53,6 +56,8 @@ const App = () => {
       .then((apiData) => dispatch({ type: 'set_api_data', apiData }))
       .catch((error) => alert(error.message))
   }, [])
+
+  const handleClickStart = () => dispatch({ type: 'clicked_start' })
 
   const handleClickOption = (index) =>
     dispatch({ type: 'clicked_option', index })
@@ -74,8 +79,16 @@ const App = () => {
           <h1>Quiz dos Videogames</h1>
         </header>
         <main className="main">
-          {state.shouldShowStart && <h2> Tela Inicial</h2>}
-          {state.shouldShowResult && !state.shouldShowStart && (
+          {state.appStatus === 'ready' && (
+            <div className="start">
+              <h2>Bem-vindo(a) ao Quiz dos Videogames!</h2>
+              <h3>{state.apiData.length} Questões para te testar</h3>
+              <button onClick={handleClickStart} className="btn">
+                Bora começar
+              </button>
+            </div>
+          )}
+          {state.appStatus === 'finished' && (
             <>
               <div className="result">
                 <span>
@@ -88,52 +101,51 @@ const App = () => {
               </button>
             </>
           )}
-          {state.apiData.length > 0 &&
-            !state.shouldShowResult &&
-            !state.shouldShowStart && (
-              <>
+
+          {state.apiData.length > 0 && state.appStatus === 'active' && (
+            <>
+              <div>
+                <h4>{state.apiData[state.currentQuestion].question}</h4>
+                <ul className="options">
+                  {state.apiData[state.currentQuestion].options.map(
+                    (option, index) => {
+                      const answersClass =
+                        state.clickedOption === index ? 'answer' : ''
+                      const correctOrWrongClass = userHasAnwered
+                        ? state.apiData[state.currentQuestion]
+                            ?.correctOption === index
+                          ? 'correct'
+                          : 'wrong'
+                        : ''
+                      return (
+                        <li key={option}>
+                          <button
+                            onClick={() => handleClickOption(index)}
+                            className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                            disabled={userHasAnwered}
+                          >
+                            {option}
+                          </button>
+                        </li>
+                      )
+                    },
+                  )}
+                </ul>
+              </div>
+              {userHasAnwered && (
                 <div>
-                  <h4>{state.apiData[state.currentQuestion].question}</h4>
-                  <ul className="options">
-                    {state.apiData[state.currentQuestion].options.map(
-                      (option, index) => {
-                        const answersClass =
-                          state.clickedOption === index ? 'answer' : ''
-                        const correctOrWrongClass = userHasAnwered
-                          ? state.apiData[state.currentQuestion]
-                              ?.correctOption === index
-                            ? 'correct'
-                            : 'wrong'
-                          : ''
-                        return (
-                          <li key={option}>
-                            <button
-                              onClick={() => handleClickOption(index)}
-                              className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
-                              disabled={userHasAnwered}
-                            >
-                              {option}
-                            </button>
-                          </li>
-                        )
-                      },
-                    )}
-                  </ul>
+                  <button
+                    onClick={handleClickNextQustion}
+                    className="btn btn-ui"
+                  >
+                    {state.currentQuestion === state.apiData.length - 1
+                      ? 'Finalizar'
+                      : 'Proxima'}
+                  </button>
                 </div>
-                {userHasAnwered && (
-                  <div>
-                    <button
-                      onClick={handleClickNextQustion}
-                      className="btn btn-ui"
-                    >
-                      {state.currentQuestion === state.apiData.length - 1
-                        ? 'Finalizar'
-                        : 'Proxima'}
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
+              )}
+            </>
+          )}
         </main>
       </div>
     </>
