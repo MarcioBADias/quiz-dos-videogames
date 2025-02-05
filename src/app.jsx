@@ -1,5 +1,7 @@
 import { useEffect, useReducer } from 'react'
 
+const secondsPerQuestion = 30
+
 const reduce = (state, action) => {
   if (action.type === 'set_api_data') {
     return { ...state, apiData: action.apiData }
@@ -23,15 +25,34 @@ const reduce = (state, action) => {
       currentQuestion: wasLastQuestion ? 0 : state.currentQuestion + 1,
       clickedOption: null,
       appStatus: wasLastQuestion ? 'finished' : state.appStatus,
+      seconds: wasLastQuestion ? null : state.seconds,
     }
   }
 
   if (action.type === 'clicked_restart') {
-    return { ...state, userScore: 0, appStatus: 'ready' }
+    return {
+      ...state,
+      userScore: 0,
+      appStatus: 'ready',
+      currentQuestion: 0,
+      clickedOption: null,
+    }
   }
 
   if (action.type === 'clicked_start') {
-    return { ...state, appStatus: 'active' }
+    return {
+      ...state,
+      appStatus: 'active',
+      seconds: secondsPerQuestion * state.apiData.length,
+    }
+  }
+
+  if (action.type === 'tick') {
+    return {
+      ...state,
+      seconds: state.seconds === 0 ? null : state.seconds - 1,
+      appStatus: state.seconds === 0 ? 'finished' : state.appStatus,
+    }
   }
 
   return state
@@ -43,6 +64,7 @@ const initialState = {
   clickedOption: null,
   userScore: 0,
   appStatus: 'ready',
+  seconds: null,
 }
 
 const App = () => {
@@ -57,6 +79,15 @@ const App = () => {
       .catch((error) => alert(error.message))
   }, [])
 
+  useEffect(() => {
+    if (state.seconds === null) {
+      return
+    }
+
+    const id = setTimeout(() => dispatch({ type: 'tick' }), 1000)
+    return () => clearTimeout(id)
+  }, [state.seconds])
+
   const handleClickStart = () => dispatch({ type: 'clicked_start' })
 
   const handleClickOption = (index) =>
@@ -70,6 +101,8 @@ const App = () => {
   const userHasAnwered = state.clickedOption !== null
   const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
   const percentage = (state.userScore / maxScore) * 100
+  const minutes = Math.floor(state.seconds / 60)
+  const seconds = state.seconds % 60
 
   return (
     <>
@@ -131,6 +164,10 @@ const App = () => {
                     },
                   )}
                 </ul>
+              </div>
+              <div className="timer">
+                {minutes < 10 ? `0${minutes}` : minutes} :{' '}
+                {seconds < 10 ? `0${seconds}` : seconds}
               </div>
               {userHasAnwered && (
                 <div>
