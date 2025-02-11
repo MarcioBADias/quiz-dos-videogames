@@ -119,6 +119,9 @@ const App = () => {
   const userHasAnwered = state.clickedOption !== null
   const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
   const percentage = (state.userScore / maxScore) * 100
+  const progressValue = userHasAnwered
+    ? state.currentQuestion + 1
+    : state.currentQuestion
 
   return (
     <>
@@ -153,6 +156,22 @@ const App = () => {
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
             <>
+              <header className="progress">
+                <label>
+                  <progress max={state.apiData.length} value={progressValue}>
+                    {progressValue}
+                  </progress>
+                  <span>
+                    Questao <b>{state.currentQuestion + 1}</b> de{' '}
+                    {state.apiData.length}
+                  </span>
+                  <span>
+                    <b>
+                      {state.userScore} / {maxScore} pontos
+                    </b>
+                  </span>
+                </label>
+              </header>
               <div>
                 <h4>{state.apiData[state.currentQuestion].question}</h4>
                 <ul className="options">
