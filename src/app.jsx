@@ -1,4 +1,6 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useReducer, useState } from 'react'
+
+const secondsPerQuestion = 30
 
 const reduce = (state, action) => {
   if (action.type === 'set_api_data') {
@@ -27,11 +29,27 @@ const reduce = (state, action) => {
   }
 
   if (action.type === 'clicked_restart') {
-    return { ...state, userScore: 0, appStatus: 'ready' }
+    return {
+      ...state,
+      userScore: 0,
+      appStatus: 'ready',
+      currentQuestion: 0,
+      clickedOption: null,
+    }
   }
 
   if (action.type === 'clicked_start') {
-    return { ...state, appStatus: 'active' }
+    return {
+      ...state,
+      appStatus: 'active',
+    }
+  }
+
+  if (action.type === 'game_over') {
+    return {
+      ...state,
+      appStatus: 'finished',
+    }
   }
 
   return state
@@ -43,6 +61,35 @@ const initialState = {
   clickedOption: null,
   userScore: 0,
   appStatus: 'ready',
+}
+
+const Timer = ({ appState, onHandleTimer }) => {
+  const [seconds, setSeconds] = useState(
+    secondsPerQuestion * appState.apiData.length,
+  )
+
+  useEffect(() => {
+    if (seconds === 0) {
+      onHandleTimer({ message: 'game_over' })
+      return
+    }
+
+    if (appState.status === 'finished') {
+      return
+    }
+
+    const id = setTimeout(() => setSeconds((prev) => prev - 1), 1000)
+    return () => clearTimeout(id)
+  }, [seconds, onHandleTimer, appState])
+
+  const minutes = Math.floor(seconds / 60)
+  const secs = seconds % 60
+
+  return (
+    <div className="timer">
+      {minutes < 10 ? `0${minutes}` : minutes} : {secs < 10 ? `0${secs}` : secs}
+    </div>
+  )
 }
 
 const App = () => {
@@ -67,9 +114,14 @@ const App = () => {
 
   const handleClickRestart = () => dispatch({ type: 'clicked_restart' })
 
+  const handleTimer = ({ message }) => dispatch({ type: message })
+
   const userHasAnwered = state.clickedOption !== null
   const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
   const percentage = (state.userScore / maxScore) * 100
+  const progressValue = userHasAnwered
+    ? state.currentQuestion + 1
+    : state.currentQuestion
 
   return (
     <>
@@ -104,6 +156,22 @@ const App = () => {
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
             <>
+              <header className="progress">
+                <label>
+                  <progress max={state.apiData.length} value={progressValue}>
+                    {progressValue}
+                  </progress>
+                  <span>
+                    Questao <b>{state.currentQuestion + 1}</b> de{' '}
+                    {state.apiData.length}
+                  </span>
+                  <span>
+                    <b>
+                      {state.userScore} / {maxScore} pontos
+                    </b>
+                  </span>
+                </label>
+              </header>
               <div>
                 <h4>{state.apiData[state.currentQuestion].question}</h4>
                 <ul className="options">
@@ -132,6 +200,7 @@ const App = () => {
                   )}
                 </ul>
               </div>
+              <Timer appState={state} onHandleTimer={handleTimer} />
               {userHasAnwered && (
                 <div>
                   <button
