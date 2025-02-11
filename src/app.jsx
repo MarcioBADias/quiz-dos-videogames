@@ -99,38 +99,54 @@ const Header = () => (
   </header>
 )
 
-const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => {
-  return (
-    <div>
-      <h4>{appState.apiData[appState.currentQuestion].question}</h4>
-      <ul className="options">
-        {appState.apiData[appState.currentQuestion].options.map(
-          (option, index) => {
-            const answersClass =
-              appState.clickedOption === index ? 'answer' : ''
-            const correctOrWrongClass = onUserHasAnwered
-              ? appState.apiData[appState.currentQuestion]?.correctOption ===
-                index
-                ? 'correct'
-                : 'wrong'
-              : ''
-            return (
-              <li key={option}>
-                <button
-                  onClick={() => onHandleClickOption(index)}
-                  className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
-                  disabled={onUserHasAnwered}
-                >
-                  {option}
-                </button>
-              </li>
-            )
-          },
-        )}
-      </ul>
-    </div>
-  )
-}
+const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => (
+  <div>
+    <h4>{appState.apiData[appState.currentQuestion].question}</h4>
+    <ul className="options">
+      {appState.apiData[appState.currentQuestion].options.map(
+        (option, index) => {
+          const answersClass = appState.clickedOption === index ? 'answer' : ''
+          const correctOrWrongClass = onUserHasAnwered
+            ? appState.apiData[appState.currentQuestion]?.correctOption ===
+              index
+              ? 'correct'
+              : 'wrong'
+            : ''
+          return (
+            <li key={option}>
+              <button
+                onClick={() => onHandleClickOption(index)}
+                className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                disabled={onUserHasAnwered}
+              >
+                {option}
+              </button>
+            </li>
+          )
+        },
+      )}
+    </ul>
+  </div>
+)
+
+const ProgressBar = ({ appState, progressValue, maxScore }) => (
+  <header className="progress">
+    <label>
+      <progress max={appState.apiData.length} value={progressValue}>
+        {progressValue}
+      </progress>
+      <span>
+        Questao <b>{appState.currentQuestion + 1}</b> de{' '}
+        {appState.apiData.length}
+      </span>
+      <span>
+        <b>
+          {appState.userScore} / {maxScore} pontos
+        </b>
+      </span>
+    </label>
+  </header>
+)
 
 const App = () => {
   const [state, dispatch] = useReducer(reduce, initialState)
@@ -193,23 +209,11 @@ const App = () => {
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
             <>
-              <header className="progress">
-                <label>
-                  <progress max={state.apiData.length} value={progressValue}>
-                    {progressValue}
-                  </progress>
-                  <span>
-                    Questao <b>{state.currentQuestion + 1}</b> de{' '}
-                    {state.apiData.length}
-                  </span>
-                  <span>
-                    <b>
-                      {state.userScore} / {maxScore} pontos
-                    </b>
-                  </span>
-                </label>
-              </header>{' '}
-              //ProgressBar
+              <ProgressBar
+                appState={state}
+                progressValue={progressValue}
+                maxScore={maxScore}
+              />
               <Questions
                 appState={state}
                 onUserHasAnwered={userHasAnwered}
