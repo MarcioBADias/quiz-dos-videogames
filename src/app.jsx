@@ -92,6 +92,46 @@ const Timer = ({ appState, onHandleTimer }) => {
   )
 }
 
+const Header = () => (
+  <header className="app-header">
+    <img src="./img/logo-quiz-videogames.png" alt="Logo" />
+    <h1>Quiz dos Videogames</h1>
+  </header>
+)
+
+const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => {
+  return (
+    <div>
+      <h4>{appState.apiData[appState.currentQuestion].question}</h4>
+      <ul className="options">
+        {appState.apiData[appState.currentQuestion].options.map(
+          (option, index) => {
+            const answersClass =
+              appState.clickedOption === index ? 'answer' : ''
+            const correctOrWrongClass = onUserHasAnwered
+              ? appState.apiData[appState.currentQuestion]?.correctOption ===
+                index
+                ? 'correct'
+                : 'wrong'
+              : ''
+            return (
+              <li key={option}>
+                <button
+                  onClick={() => onHandleClickOption(index)}
+                  className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                  disabled={onUserHasAnwered}
+                >
+                  {option}
+                </button>
+              </li>
+            )
+          },
+        )}
+      </ul>
+    </div>
+  )
+}
+
 const App = () => {
   const [state, dispatch] = useReducer(reduce, initialState)
 
@@ -126,10 +166,7 @@ const App = () => {
   return (
     <>
       <div className="app">
-        <header className="app-header">
-          <img src="./img/logo-quiz-videogames.png" alt="Logo" />
-          <h1>Quiz dos Videogames</h1>
-        </header>
+        <Header />
         <main className="main">
           {state.appStatus === 'ready' && (
             <div className="start">
@@ -138,7 +175,7 @@ const App = () => {
               <button onClick={handleClickStart} className="btn">
                 Bora começar
               </button>
-            </div>
+            </div> //InitialScreen
           )}
           {state.appStatus === 'finished' && (
             <>
@@ -151,7 +188,7 @@ const App = () => {
               <button onClick={handleClickRestart} className="btn btn-ui">
                 Reiniciar o Quiz
               </button>
-            </>
+            </> //ResultScreen
           )}
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
@@ -171,35 +208,13 @@ const App = () => {
                     </b>
                   </span>
                 </label>
-              </header>
-              <div>
-                <h4>{state.apiData[state.currentQuestion].question}</h4>
-                <ul className="options">
-                  {state.apiData[state.currentQuestion].options.map(
-                    (option, index) => {
-                      const answersClass =
-                        state.clickedOption === index ? 'answer' : ''
-                      const correctOrWrongClass = userHasAnwered
-                        ? state.apiData[state.currentQuestion]
-                            ?.correctOption === index
-                          ? 'correct'
-                          : 'wrong'
-                        : ''
-                      return (
-                        <li key={option}>
-                          <button
-                            onClick={() => handleClickOption(index)}
-                            className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
-                            disabled={userHasAnwered}
-                          >
-                            {option}
-                          </button>
-                        </li>
-                      )
-                    },
-                  )}
-                </ul>
-              </div>
+              </header>{' '}
+              //ProgressBar
+              <Questions
+                appState={state}
+                onUserHasAnwered={userHasAnwered}
+                onHandleClickOption={handleClickOption}
+              />
               <Timer appState={state} onHandleTimer={handleTimer} />
               {userHasAnwered && (
                 <div>
@@ -211,7 +226,7 @@ const App = () => {
                       ? 'Finalizar'
                       : 'Proxima'}
                   </button>
-                </div>
+                </div> //StepsButtons
               )}
             </>
           )}
