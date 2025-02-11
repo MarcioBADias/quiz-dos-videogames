@@ -148,6 +148,16 @@ const ProgressBar = ({ appState, progressValue, maxScore }) => (
   </header>
 )
 
+const StepButtons = ({ appState, onHandleClickNextQuestion }) => (
+  <div>
+    <button onClick={onHandleClickNextQuestion} className="btn btn-ui">
+      {appState.currentQuestion === appState.apiData.length - 1
+        ? 'Finalizar'
+        : 'Proxima'}
+    </button>
+  </div>
+)
+
 const App = () => {
   const [state, dispatch] = useReducer(reduce, initialState)
 
@@ -165,7 +175,7 @@ const App = () => {
   const handleClickOption = (index) =>
     dispatch({ type: 'clicked_option', index })
 
-  const handleClickNextQustion = () =>
+  const handleClickNextQuestion = () =>
     dispatch({ type: 'clicked_next_question' })
 
   const handleClickRestart = () => dispatch({ type: 'clicked_restart' })
@@ -221,16 +231,10 @@ const App = () => {
               />
               <Timer appState={state} onHandleTimer={handleTimer} />
               {userHasAnwered && (
-                <div>
-                  <button
-                    onClick={handleClickNextQustion}
-                    className="btn btn-ui"
-                  >
-                    {state.currentQuestion === state.apiData.length - 1
-                      ? 'Finalizar'
-                      : 'Proxima'}
-                  </button>
-                </div> //StepsButtons
+                <StepButtons
+                  appState={state}
+                  onHandleClickNextQuestion={handleClickNextQuestion}
+                />
               )}
             </>
           )}
