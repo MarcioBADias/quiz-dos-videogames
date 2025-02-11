@@ -92,6 +92,101 @@ const Timer = ({ appState, onHandleTimer }) => {
   )
 }
 
+const Header = () => (
+  <header className="app-header">
+    <img src="./img/logo-quiz-videogames.png" alt="Logo" />
+    <h1>Quiz dos Videogames</h1>
+  </header>
+)
+
+const InitialScreen = ({ appState, onHandleClickStart }) => (
+  <div className="start">
+    <h2>Bem-vindo(a) ao Quiz dos Videogames!</h2>
+    <h3>{appState.apiData.length} Questões para te testar</h3>
+    <button onClick={onHandleClickStart} className="btn">
+      Bora começar
+    </button>
+  </div>
+)
+
+const ResultScreen = ({
+  appState,
+  maxScore,
+  percentage,
+  onHandleClickRestart,
+}) => (
+  <>
+    <div className="result">
+      <span>
+        Voce fez <b>{appState.userScore}</b> pontos de {maxScore} ({percentage}
+        %)
+      </span>
+    </div>
+    <button onClick={onHandleClickRestart} className="btn btn-ui">
+      Reiniciar o Quiz
+    </button>
+  </>
+)
+
+const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => (
+  <div>
+    <h4>{appState.apiData[appState.currentQuestion].question}</h4>
+    <ul className="options">
+      {appState.apiData[appState.currentQuestion].options.map(
+        (option, index) => {
+          const answersClass = appState.clickedOption === index ? 'answer' : ''
+          const correctOrWrongClass = onUserHasAnwered
+            ? appState.apiData[appState.currentQuestion]?.correctOption ===
+              index
+              ? 'correct'
+              : 'wrong'
+            : ''
+          return (
+            <li key={option}>
+              <button
+                onClick={() => onHandleClickOption(index)}
+                className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
+                disabled={onUserHasAnwered}
+              >
+                {option}
+              </button>
+            </li>
+          )
+        },
+      )}
+    </ul>
+  </div>
+)
+
+const ProgressBar = ({ appState, progressValue, maxScore }) => (
+  <header className="progress">
+    <label>
+      <progress max={appState.apiData.length} value={progressValue}>
+        {progressValue}
+      </progress>
+      <span>
+        Questao <b>{appState.currentQuestion + 1}</b> de{' '}
+        {appState.apiData.length}
+      </span>
+      <span>
+        <b>
+          {appState.userScore} / {maxScore} pontos
+        </b>
+      </span>
+    </label>
+  </header>
+)
+
+const StepButtons = ({ appState, onHandleClickNextQuestion }) => (
+  <div>
+    <button onClick={onHandleClickNextQuestion} className="btn btn-ui">
+      {appState.currentQuestion === appState.apiData.length - 1
+        ? 'Finalizar'
+        : 'Proxima'}
+    </button>
+  </div>
+)
+
 const App = () => {
   const [state, dispatch] = useReducer(reduce, initialState)
 
@@ -109,7 +204,7 @@ const App = () => {
   const handleClickOption = (index) =>
     dispatch({ type: 'clicked_option', index })
 
-  const handleClickNextQustion = () =>
+  const handleClickNextQuestion = () =>
     dispatch({ type: 'clicked_next_question' })
 
   const handleClickRestart = () => dispatch({ type: 'clicked_restart' })
@@ -126,92 +221,41 @@ const App = () => {
   return (
     <>
       <div className="app">
-        <header className="app-header">
-          <img src="./img/logo-quiz-videogames.png" alt="Logo" />
-          <h1>Quiz dos Videogames</h1>
-        </header>
+        <Header />
         <main className="main">
           {state.appStatus === 'ready' && (
-            <div className="start">
-              <h2>Bem-vindo(a) ao Quiz dos Videogames!</h2>
-              <h3>{state.apiData.length} Questões para te testar</h3>
-              <button onClick={handleClickStart} className="btn">
-                Bora começar
-              </button>
-            </div>
+            <InitialScreen
+              appState={state}
+              onHandleClickStart={handleClickStart}
+            />
           )}
           {state.appStatus === 'finished' && (
-            <>
-              <div className="result">
-                <span>
-                  Voce fez <b>{state.userScore}</b> pontos de {maxScore} (
-                  {percentage}%)
-                </span>
-              </div>
-              <button onClick={handleClickRestart} className="btn btn-ui">
-                Reiniciar o Quiz
-              </button>
-            </>
+            <ResultScreen
+              appState={state}
+              maxScore={maxScore}
+              percentage={percentage}
+              onHandleClickRestart={handleClickRestart}
+            />
           )}
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
             <>
-              <header className="progress">
-                <label>
-                  <progress max={state.apiData.length} value={progressValue}>
-                    {progressValue}
-                  </progress>
-                  <span>
-                    Questao <b>{state.currentQuestion + 1}</b> de{' '}
-                    {state.apiData.length}
-                  </span>
-                  <span>
-                    <b>
-                      {state.userScore} / {maxScore} pontos
-                    </b>
-                  </span>
-                </label>
-              </header>
-              <div>
-                <h4>{state.apiData[state.currentQuestion].question}</h4>
-                <ul className="options">
-                  {state.apiData[state.currentQuestion].options.map(
-                    (option, index) => {
-                      const answersClass =
-                        state.clickedOption === index ? 'answer' : ''
-                      const correctOrWrongClass = userHasAnwered
-                        ? state.apiData[state.currentQuestion]
-                            ?.correctOption === index
-                          ? 'correct'
-                          : 'wrong'
-                        : ''
-                      return (
-                        <li key={option}>
-                          <button
-                            onClick={() => handleClickOption(index)}
-                            className={`btn btn-option ${answersClass} ${correctOrWrongClass}`}
-                            disabled={userHasAnwered}
-                          >
-                            {option}
-                          </button>
-                        </li>
-                      )
-                    },
-                  )}
-                </ul>
-              </div>
+              <ProgressBar
+                appState={state}
+                progressValue={progressValue}
+                maxScore={maxScore}
+              />
+              <Questions
+                appState={state}
+                onUserHasAnwered={userHasAnwered}
+                onHandleClickOption={handleClickOption}
+              />
               <Timer appState={state} onHandleTimer={handleTimer} />
               {userHasAnwered && (
-                <div>
-                  <button
-                    onClick={handleClickNextQustion}
-                    className="btn btn-ui"
-                  >
-                    {state.currentQuestion === state.apiData.length - 1
-                      ? 'Finalizar'
-                      : 'Proxima'}
-                  </button>
-                </div>
+                <StepButtons
+                  appState={state}
+                  onHandleClickNextQuestion={handleClickNextQuestion}
+                />
               )}
             </>
           )}
