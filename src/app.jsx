@@ -109,25 +109,24 @@ const InitialScreen = ({ appState, onHandleClickStart }) => (
   </div>
 )
 
-const ResultScreen = ({
-  appState,
-  maxScore,
-  percentage,
-  onHandleClickRestart,
-}) => (
-  <>
-    <div className="result">
-      <span>
-        Voce fez <b>{appState.userScore}</b> pontos de {maxScore} ({percentage}
-        %)
-      </span>
-    </div>
-    <button onClick={onHandleClickRestart} className="btn btn-ui">
-      Reiniciar o Quiz
-    </button>
-  </>
-)
+const ResultScreen = ({ appState, maxScore, onHandleClickRestart }) => {
+  const percentage = (appState.userScore / maxScore) * 100
 
+  return (
+    <>
+      <div className="result">
+        <span>
+          Voce fez <b>{appState.userScore}</b> pontos de {maxScore} (
+          {percentage}
+          %)
+        </span>
+      </div>
+      <button onClick={onHandleClickRestart} className="btn btn-ui">
+        Reiniciar o Quiz
+      </button>
+    </>
+  )
+}
 const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => (
   <div>
     <h4>{appState.apiData[appState.currentQuestion].question}</h4>
@@ -158,24 +157,29 @@ const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => (
   </div>
 )
 
-const ProgressBar = ({ appState, progressValue, maxScore }) => (
-  <header className="progress">
-    <label>
-      <progress max={appState.apiData.length} value={progressValue}>
-        {progressValue}
-      </progress>
-      <span>
-        Questao <b>{appState.currentQuestion + 1}</b> de{' '}
-        {appState.apiData.length}
-      </span>
-      <span>
-        <b>
-          {appState.userScore} / {maxScore} pontos
-        </b>
-      </span>
-    </label>
-  </header>
-)
+const ProgressBar = ({ appState, maxScore, onUserHasAnwered }) => {
+  const progressValue = onUserHasAnwered
+    ? appState.currentQuestion + 1
+    : appState.currentQuestion
+  return (
+    <header className="progress">
+      <label>
+        <progress max={appState.apiData.length} value={progressValue}>
+          {progressValue}
+        </progress>
+        <span>
+          Questao <b>{appState.currentQuestion + 1}</b> de{' '}
+          {appState.apiData.length}
+        </span>
+        <span>
+          <b>
+            {appState.userScore} / {maxScore} pontos
+          </b>
+        </span>
+      </label>
+    </header>
+  )
+}
 
 const StepButtons = ({ appState, onHandleClickNextQuestion }) => (
   <div>
@@ -213,10 +217,6 @@ const App = () => {
 
   const userHasAnwered = state.clickedOption !== null
   const maxScore = state.apiData.reduce((acc, q) => acc + q.points, 0)
-  const percentage = (state.userScore / maxScore) * 100
-  const progressValue = userHasAnwered
-    ? state.currentQuestion + 1
-    : state.currentQuestion
 
   return (
     <>
@@ -233,7 +233,6 @@ const App = () => {
             <ResultScreen
               appState={state}
               maxScore={maxScore}
-              percentage={percentage}
               onHandleClickRestart={handleClickRestart}
             />
           )}
@@ -242,8 +241,8 @@ const App = () => {
             <>
               <ProgressBar
                 appState={state}
-                progressValue={progressValue}
                 maxScore={maxScore}
+                onUserHasAnwered={userHasAnwered}
               />
               <Questions
                 appState={state}
