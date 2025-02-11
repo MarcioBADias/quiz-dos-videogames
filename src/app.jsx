@@ -99,6 +99,35 @@ const Header = () => (
   </header>
 )
 
+const InitialScreen = ({ appState, onHandleClickStart }) => (
+  <div className="start">
+    <h2>Bem-vindo(a) ao Quiz dos Videogames!</h2>
+    <h3>{appState.apiData.length} Questões para te testar</h3>
+    <button onClick={onHandleClickStart} className="btn">
+      Bora começar
+    </button>
+  </div>
+)
+
+const ResultScreen = ({
+  appState,
+  maxScore,
+  percentage,
+  onHandleClickRestart,
+}) => (
+  <>
+    <div className="result">
+      <span>
+        Voce fez <b>{appState.userScore}</b> pontos de {maxScore} ({percentage}
+        %)
+      </span>
+    </div>
+    <button onClick={onHandleClickRestart} className="btn btn-ui">
+      Reiniciar o Quiz
+    </button>
+  </>
+)
+
 const Questions = ({ appState, onUserHasAnwered, onHandleClickOption }) => (
   <div>
     <h4>{appState.apiData[appState.currentQuestion].question}</h4>
@@ -195,26 +224,18 @@ const App = () => {
         <Header />
         <main className="main">
           {state.appStatus === 'ready' && (
-            <div className="start">
-              <h2>Bem-vindo(a) ao Quiz dos Videogames!</h2>
-              <h3>{state.apiData.length} Questões para te testar</h3>
-              <button onClick={handleClickStart} className="btn">
-                Bora começar
-              </button>
-            </div> //InitialScreen
+            <InitialScreen
+              appState={state}
+              onHandleClickStart={handleClickStart}
+            />
           )}
           {state.appStatus === 'finished' && (
-            <>
-              <div className="result">
-                <span>
-                  Voce fez <b>{state.userScore}</b> pontos de {maxScore} (
-                  {percentage}%)
-                </span>
-              </div>
-              <button onClick={handleClickRestart} className="btn btn-ui">
-                Reiniciar o Quiz
-              </button>
-            </> //ResultScreen
+            <ResultScreen
+              appState={state}
+              maxScore={maxScore}
+              percentage={percentage}
+              onHandleClickRestart={handleClickRestart}
+            />
           )}
 
           {state.apiData.length > 0 && state.appStatus === 'active' && (
