@@ -69,16 +69,14 @@ const Timer = ({ appState, onHandleTimer }) => {
   )
 
   useEffect(() => {
-    if (seconds === 0) {
-      onHandleTimer({ message: 'game_over' })
-      return
+    let id
+
+    const run = () => {
+      seconds === 0 && onHandleTimer({ message: 'game_over' })
+      id = setTimeout(() => setSeconds((prev) => prev - 1), 10)
     }
 
-    if (appState.status === 'finished') {
-      return
-    }
-
-    const id = setTimeout(() => setSeconds((prev) => prev - 1), 1000)
+    run()
     return () => clearTimeout(id)
   }, [seconds, onHandleTimer, appState])
 
